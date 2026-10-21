@@ -1182,7 +1182,7 @@ form.addEventListener('submit', async e => {
 });
 
 function success(p, serverCode) {
-  const code = serverCode || ('BOOLD-' + Math.random().toString(36).slice(2, 7).toUpperCase());
+  const code = serverCode || ('SPOOK-' + Math.random().toString(36).slice(2, 7).toUpperCase());
   $('#t-name').textContent = p.fullName; $('#t-sid').textContent = p.studentId; $('#t-course').textContent = p.course;
   $('#t-year').textContent = ['', '1st', '2nd', '3rd', '4th'][p.academicYear] + ' Year, Semester ' + p.semester; $('#t-code').textContent = code;
   const r = fw.getBoundingClientRect();
@@ -1331,3 +1331,4 @@ document.addEventListener('visibilitychange', () => { document.title = document.
 </script>
 </body>
 </html>
+
