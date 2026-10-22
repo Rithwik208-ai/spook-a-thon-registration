@@ -492,6 +492,7 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
 .low-effects .reaper,.low-effects .countdown,.low-effects .count-grid strong,
 .low-effects #blood .blood-sheet::after,.low-effects .witch-perch{animation:none!important}
 .low-effects .intro-stage::before{animation:none!important}
+.conditional[hidden],.ticket-member2[hidden]{display:none!important}
 .low-effects #fx{display:none!important}
 .low-effects .formwrap::before,.low-effects .form-head::after,.low-effects .gate::before,
 .low-effects .gate::after,.low-effects .door-glow,.low-effects .spider svg,
@@ -603,25 +604,25 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
             <form id="regForm" novalidate>
               <div class="form-head">
                 <h2 id="regTitle">Register for Spook-a-thon</h2>
-                <p class="sub">Seven details, seven candles. Light them all.</p>
+                <p class="sub">Register solo or as a two-person team.</p>
                 <div class="candles" aria-hidden="true" id="candles"></div>
                 <p class="progress" id="progress" aria-live="polite">0 of 7 details done</p>
               </div>
 
               <div class="field" data-hint="">
-                <label for="name">Full name<b aria-hidden="true">*</b></label>
+                <label for="name">Team member 1 — full name<b aria-hidden="true">*</b></label>
                 <div class="control"><input id="name" name="name" type="text" autocomplete="name" placeholder="Your name as on your ID card" required aria-describedby="m-name"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
                 <p class="msg" id="m-name"></p>
               </div>
 
-              <div class="field" data-hint="Exactly 11 digits, numbers only.">
-                <label for="sid">Enrollment number<b aria-hidden="true">*</b></label>
-                <div class="control"><input id="sid" name="sid" type="text" inputmode="numeric" autocomplete="off" maxlength="11" pattern="[0-9]{11}" placeholder="11-digit enrollment number" required aria-describedby="m-sid"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
-                <p class="msg" id="m-sid">Exactly 11 digits, numbers only.</p>
+              <div class="field" data-hint="Letters and numbers are accepted, up to 32 characters.">
+                <label for="sid">Team member 1 — enrollment number<b aria-hidden="true">*</b></label>
+                <div class="control"><input id="sid" name="sid" type="text" autocomplete="off" maxlength="32" placeholder="Your enrollment number" required aria-describedby="m-sid"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
+                <p class="msg" id="m-sid">Letters and numbers are accepted, up to 32 characters.</p>
               </div>
 
               <div class="field" data-hint="Enter your 10-digit Indian mobile number.">
-                <label for="phone">Phone number<b aria-hidden="true">*</b></label>
+                <label for="phone">Team member 1 — phone number<b aria-hidden="true">*</b></label>
                 <div class="control">
                   <span class="prefix" aria-hidden="true">
                     <svg viewBox="0 0 22 15"><rect width="22" height="5" fill="#ff9933"/><rect y="5" width="22" height="5" fill="#fff"/><rect y="10" width="22" height="5" fill="#138808"/><circle cx="11" cy="7.5" r="1.9" fill="none" stroke="#000080" stroke-width=".6"/></svg>+91
@@ -632,9 +633,9 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
               </div>
 
               <div class="field" data-hint="">
-                <label for="email">Email address<b aria-hidden="true">*</b></label>
-                <div class="control"><input id="email" name="email" type="email" autocomplete="email" placeholder="you@university.edu" required aria-describedby="m-email"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
-                <p class="msg" id="m-email"></p>
+                <label for="email">Team member 1 — email address<b aria-hidden="true">*</b></label>
+                <div class="control"><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="m-email"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
+                <p class="msg" id="m-email">Personal email addresses are accepted.</p>
               </div>
 
               <div class="field" data-hint="">
@@ -672,6 +673,11 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
                 </div>
                 <p class="msg" id="m-course"></p>
               </div>
+              <div class="field conditional" id="otherCourseField" data-hint="" hidden>
+                <label for="otherCourse">Enter your course / programme<b aria-hidden="true">*</b></label>
+                <div class="control"><input id="otherCourse" name="otherCourse" type="text" maxlength="100" placeholder="Type your course or programme" aria-describedby="m-otherCourse"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
+                <p class="msg" id="m-otherCourse"></p>
+              </div>
 
               <div class="row2">
                 <div class="field" data-hint="">
@@ -686,21 +692,22 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
                   <p class="msg" id="m-year"></p>
                 </div>
                 <div class="field" data-hint="">
-                  <label for="sem">Semester<b aria-hidden="true">*</b></label>
-                  <div class="control">
-                    <select id="sem" name="sem" required disabled aria-describedby="m-sem">
-                      <option value="" disabled selected hidden>Choose year first</option>
-                    </select>
-                    <svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg>
-                  </div>
-                  <p class="msg" id="m-sem"></p>
+                  <label for="teamSize">Team size<b aria-hidden="true">*</b></label>
+                  <div class="control"><select id="teamSize" name="teamSize" required aria-describedby="m-teamSize"><option value="1" selected>1 member (solo)</option><option value="2">2 members</option></select><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
+                  <p class="msg" id="m-teamSize"></p>
                 </div>
+              </div>
+              <div class="conditional" id="member2Fields" hidden>
+                <p class="sub">Team member 2 details</p>
+                <div class="field"><label for="member2Name">Full name<b aria-hidden="true">*</b></label><div class="control"><input id="member2Name" type="text" autocomplete="name" placeholder="Second member's full name" maxlength="100" aria-describedby="m-member2Name"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Name"></p></div>
+                <div class="field"><label for="member2Phone">Phone number<b aria-hidden="true">*</b></label><div class="control"><input id="member2Phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit Indian mobile number" maxlength="14" aria-describedby="m-member2Phone"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Phone"></p></div>
+                <div class="field"><label for="member2Email">Email address<b aria-hidden="true">*</b></label><div class="control"><input id="member2Email" type="email" autocomplete="email" placeholder="second@example.com" maxlength="120" aria-describedby="m-member2Email"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Email">Personal email addresses are accepted.</p></div>
               </div>
 
               <div class="cta-wrap" id="ctaWrap">
                 <button class="cta" id="cta" type="submit">Complete registration</button>
               </div>
-              <p class="fine">All fields are required.</p>
+              <p class="fine">All fields shown are required. Personal email addresses are welcome.</p>
             </form>
 
             <div class="ticket" id="ticket" hidden tabindex="-1" aria-live="polite">
@@ -711,6 +718,7 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
                 <dt>Enrollment number</dt><dd id="t-sid"></dd>
                 <dt>Course</dt><dd id="t-course"></dd>
                 <dt>Year</dt><dd id="t-year"></dd>
+                <dt class="ticket-member2" hidden>Team member 2</dt><dd class="ticket-member2" id="t-member2" hidden></dd>
                 <dt>Pass code</dt><dd><span class="code" id="t-code"></span></dd>
               </dl>
               <p class="when">29 October 2026, 2:30 PM onwards. Venue to be announced.</p>
@@ -784,38 +792,53 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
       toast.textContent = message; toast.style.opacity = '1'; toast.style.transform = 'translate(-50%,0)';
       clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%,30px)'; }, 5000);
     };
-    field('year').addEventListener('change', () => {
-      const year = Number(field('year').value), sem = field('sem'); sem.replaceChildren(new Option('Choose semester', '', true, true));
-      sem.options[0].disabled = true; sem.options[0].hidden = true;
-      if (year) { [2 * year - 1, 2 * year].forEach(n => sem.add(new Option('Semester ' + n, String(n)))); sem.disabled = false; }
-      else sem.disabled = true;
-    });
+    const fields = ['name','sid','phone','email','course','year','teamSize','otherCourse','member2Name','member2Phone','member2Email'];
+    const phoneDigits = id => field(id).value.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '').replace(/^0(?=\d{10}$)/, '');
+    const sync = () => {
+      const other = field('course').value === 'Other', pair = field('teamSize').value === '2';
+      field('otherCourseField').hidden = !other; field('otherCourse').disabled = !other; field('otherCourse').required = other;
+      field('member2Fields').hidden = !pair;
+      ['member2Name','member2Phone','member2Email'].forEach(id => { field(id).disabled = !pair; field(id).required = pair; });
+    };
+    field('course').addEventListener('change', sync); field('teamSize').addEventListener('change', sync); sync();
     form.addEventListener('submit', async event => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
-      const name = field('name').value.trim(), sid = field('sid').value.replace(/\D/g, ''), phone = field('phone').value.replace(/\D/g, '');
-      const email = field('email').value.trim(), course = field('course').value, year = Number(field('year').value), semester = Number(field('sem').value);
-      const invalid = name.length < 3 ? ['name', 'Enter your full name, at least 3 characters.'] :
-        !/^\d{11}$/.test(sid) ? ['sid', 'Enrollment number must be exactly 11 digits.'] :
-        !/^[6-9]\d{9}$/.test(phone) ? ['phone', 'Enter a valid 10-digit Indian mobile number.'] : null;
+      event.preventDefault(); sync();
+      const name = field('name').value.trim(), enrollment = field('sid').value.trim(), phone = phoneDigits('phone');
+      const email = field('email').value.trim(), courseChoice = field('course').value, otherCourse = field('otherCourse').value.trim();
+      const year = Number(field('year').value), teamSize = Number(field('teamSize').value), member2Name = field('member2Name').value.trim();
+      const member2Phone = phoneDigits('member2Phone'), member2Email = field('member2Email').value.trim();
+      const emailOK = value => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+      const invalid = name.length < 3 ? ['name','Enter your full name, at least 3 characters.'] :
+        !/^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/.test(enrollment) ? ['sid','Enter an enrollment number up to 32 letters or numbers.'] :
+        !/^[6-9]\d{9}$/.test(phone) ? ['phone','Enter a valid 10-digit Indian mobile number.'] :
+        !emailOK(email) ? ['email','Enter a valid personal or school email address.'] :
+        !courseChoice ? ['course','Choose your course.'] :
+        courseChoice === 'Other' && otherCourse.length < 2 ? ['otherCourse','Enter your course or programme.'] :
+        ![1,2,3,4].includes(year) ? ['year','Choose your academic year.'] :
+        teamSize === 2 && member2Name.length < 3 ? ['member2Name','Enter the second member’s full name.'] :
+        teamSize === 2 && !/^[6-9]\d{9}$/.test(member2Phone) ? ['member2Phone','Enter a valid 10-digit Indian mobile number.'] :
+        teamSize === 2 && !emailOK(member2Email) ? ['member2Email','Enter a valid personal or school email address.'] :
+        teamSize === 2 && member2Email.toLowerCase() === email.toLowerCase() ? ['member2Email','Each team member must use a different email.'] : null;
       if (invalid) { field(invalid[0]).focus(); notify(invalid[1]); return; }
-      field('phone').value = phone; button.disabled = true; button.textContent = 'Writing your name…';
+      field('phone').value = phone; if (teamSize === 2) field('member2Phone').value = member2Phone;
+      button.disabled = true; button.textContent = 'Writing your name…';
+      const payload = { fullName:name, enrollmentNumber:enrollment, phone:'+91'+phone, email, course:courseChoice, otherCourse, academicYear:year, teamSize };
+      if (teamSize === 2) Object.assign(payload,{member2:{fullName:member2Name,phone:'+91'+member2Phone,email:member2Email}});
       const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 20000);
       try {
-        const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-          body: JSON.stringify({ fullName: name, enrollmentNumber: sid, phone: '+91' + phone, email, course, academicYear: year, semester }) });
+        const response = await fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, signal:controller.signal, body:JSON.stringify(payload) });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Registration could not be saved. Please try again.');
-        field('t-name').textContent = name; field('t-sid').textContent = sid; field('t-course').textContent = course;
-        field('t-year').textContent = ['', '1st', '2nd', '3rd', '4th'][year] + ' Year, Semester ' + semester; field('t-code').textContent = data.code || 'Registered';
-        form.hidden = true; ticket.hidden = false; ticket.focus();
-      } catch (error) {
-        notify(error.name === 'AbortError' ? 'Connection timed out. Check your internet and try again.' : error.message);
-        button.disabled = false; button.textContent = 'Complete registration';
-      } finally { clearTimeout(timeout); }
+        field('t-name').textContent = name; field('t-sid').textContent = enrollment; field('t-course').textContent = courseChoice === 'Other' ? otherCourse : courseChoice;
+        field('t-year').textContent = ['', '1st','2nd','3rd','4th'][year] + ' Year';
+        document.querySelectorAll('.ticket-member2').forEach(el => { el.hidden = teamSize !== 2; });
+        if (teamSize === 2) field('t-member2').textContent = member2Name;
+        field('t-code').textContent = data.code || 'Registered'; form.hidden = true; ticket.hidden = false; ticket.focus();
+      } catch (error) { notify(error.name === 'AbortError' ? 'Connection timed out. Check your internet and try again.' : error.message); button.disabled = false; button.textContent = 'Complete registration'; }
+      finally { clearTimeout(timeout); }
     });
     field('again').addEventListener('click', () => {
-      ticket.hidden = true; form.hidden = false; form.reset(); field('sem').replaceChildren(new Option('Choose year first', '', true, true)); field('sem').disabled = true;
+      ticket.hidden = true; form.hidden = false; form.reset(); sync();
       button.disabled = false; button.textContent = 'Complete registration';
     });
   };
@@ -1222,126 +1245,38 @@ $('#pumpkin').addEventListener('click', () => {
 /* =========================================================
    FORM
    ========================================================= */
-const ids = ['name', 'sid', 'phone', 'email', 'course', 'year', 'sem'];
+const ids = ['name','sid','phone','email','course','year','teamSize','otherCourse','member2Name','member2Phone','member2Email'];
 const E = {}; ids.forEach(id => E[id] = $('#' + id));
 const touched = new Set();
+const activeIds = () => ['name','sid','phone','email','course','year','teamSize', ...(E.course.value === 'Other' ? ['otherCourse'] : []), ...(E.teamSize.value === '2' ? ['member2Name','member2Phone','member2Email'] : [])];
 const rules = {
-  name: v => { v = v.trim(); if (!v) return 'Enter your full name.'; if (v.length < 3) return 'Enter your full name, at least 3 characters.'; if (!/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(v)) return 'Use letters, spaces, dots, apostrophes and hyphens only.'; return ''; },
-  sid: v => /^\d{11}$/.test(v) ? '' : 'Enrollment number must be exactly 11 digits, numbers only.',
-  phone: v => /^[6-9]\d{9}$/.test(v) ? '' : (v.length !== 10 ? 'Enter your 10-digit Indian mobile number.' : 'Indian mobile numbers start with 6, 7, 8 or 9.'),
-  email: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? '' : 'Enter a valid email address, like name@example.com.',
-  course: v => v ? '' : 'Choose your course.',
-  year: v => v ? '' : 'Choose your academic year.',
-  sem: v => v ? '' : 'Choose your semester.'
+  name:v=>{v=v.trim();if(!v)return'Enter your full name.';if(v.length<3)return'Enter your full name, at least 3 characters.';if(!/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(v))return'Use letters, spaces, dots, apostrophes and hyphens only.';return'';},
+  sid:v=>/^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/.test(v.trim())?'':'Enter an enrollment number up to 32 letters or numbers.',
+  phone:v=>/^[6-9]\d{9}$/.test(v)?'':'Enter a valid 10-digit Indian mobile number.',
+  email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())?'':'Enter a valid personal or school email address.',
+  course:v=>v?'':'Choose your course.',year:v=>v?'':'Choose your academic year.',teamSize:v=>['1','2'].includes(v)?'':'Choose a team size.',
+  otherCourse:v=>v.trim().length>=2?'':'Enter your course or programme.',
+  member2Name:v=>v.trim().length>=3?'':'Enter the second member’s full name.',member2Phone:v=>/^[6-9]\d{9}$/.test(v)?'':'Enter a valid 10-digit Indian mobile number.',
+  member2Email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())?'':'Enter a valid personal or school email address.'
 };
-const cEls = $$('.candle'); let lastN = 0;
-function shake(f) { f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); }
-function paint(id) {
-  const el = E[id], f = el.closest('.field'), m = $('#m-' + id), msg = rules[id](el.value), bad = !!msg && touched.has(id);
-  const was = f.classList.contains('bad');
-  f.classList.toggle('ok', !msg); f.classList.toggle('bad', bad);
-  el.setAttribute('aria-invalid', bad ? 'true' : 'false');
-  m.textContent = bad ? msg : (f.dataset.hint || '');
-  if (bad && !was && !RM) shake(f);
-}
-function candles() {
-  const n = ids.filter(id => !rules[id](E[id].value)).length;
-  cEls.forEach((c, i) => c.classList.toggle('lit', i < n));
-  if (n > lastN) Snd.blip();
-  lastN = n; $('#progress').textContent = `${n} of 7 details done`;
-  $('#ctaWrap').classList.toggle('ready', n === 7);
-}
-function fillSem(n) {
-  const s = E.sem; s.innerHTML = '';
-  const ph = new Option(n ? 'Choose semester' : 'Choose year first', '', true, true); ph.disabled = true; ph.hidden = true; s.add(ph);
-  if (!n) { s.disabled = true; return; }
-  s.disabled = false; [2 * n - 1, 2 * n].forEach(k => s.add(new Option('Semester ' + k, String(k))));
-}
-function clean(id) {
-  const el = E[id];
-  if (id === 'sid') el.value = el.value.replace(/\D/g, '').slice(0, 11);
-  if (id === 'phone') {
-    let d = el.value.replace(/\D/g, '');
-    if (d.length > 10 && d.startsWith('91')) d = d.slice(2);
-    if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
-    el.value = d.slice(0, 10);
-  }
-}
-const inkDrop = el => { // a drop of ink slides off the underline when you focus a field
-  if (RM) return;
-  const ctl = el.closest('.control'), d = document.createElement('i'); d.className = 'ink';
-  d.style.left = rand(20, 80) + '%'; ctl.appendChild(d);
-  gsap.fromTo(d, { y: 0, opacity: .9 }, { y: 18, opacity: 0, duration: .9, ease: 'power2.in', onComplete: () => d.remove() });
-};
-ids.forEach(id => {
-  const el = E[id];
-  el.addEventListener('input', () => { clean(id); if (touched.has(id)) paint(id); else if (!rules[id](el.value)) paint(id); candles(); });
-  el.addEventListener('change', () => { if (id === 'year') { fillSem(+el.value); paint('sem'); } touched.add(id); paint(id); candles(); });
-  el.addEventListener('blur', () => { if (el.value || touched.has(id)) { touched.add(id); paint(id); } });
-  el.addEventListener('focus', () => inkDrop(el));
-});
-
-let toastTween;
-function toast(msg) {
-  const t = $('#toast'); t.textContent = msg; if (toastTween) toastTween.kill();
-  toastTween = gsap.timeline().to(t, { y: 0, opacity: 1, duration: .35, ease: 'power3.out' }).to(t, { y: 30, opacity: 0, duration: .4, delay: 3 });
-}
-
-const form = $('#regForm'), cta = $('#cta'), ticket = $('#ticket');
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  ids.forEach(id => { touched.add(id); paint(id); });
-  const badId = ids.find(id => rules[id](E[id].value));
-    if (badId) {
-    $$('.field.bad').forEach(shake); Snd.err();
-    toast('Fix the highlighted fields to continue.');
-      E[badId].focus({ preventScroll: true }); E[badId].scrollIntoView({ behavior: RM || LOW_POWER ? 'auto' : 'smooth', block: 'center' });
-    return;
-  }
-  const payload = {
-    fullName: E.name.value.trim(), enrollmentNumber: E.sid.value, phone: '+91' + E.phone.value, email: E.email.value.trim(),
-    course: E.course.value, academicYear: E.year.value, semester: E.sem.value, submittedAt: new Date().toISOString()
-  };
-  cta.disabled = true; cta.textContent = 'Writing your name…';
-  try {
-    let serverCode = null;
-    if (ENDPOINT) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 20000);
-      let r;
-      try { r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller.signal }); }
-      finally { clearTimeout(timeout); }
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) { const er = new Error(data.error || 'HTTP ' + r.status); er.userMsg = data.error; throw er; }
-      serverCode = data.code || null;
-    } else await new Promise(r => setTimeout(r, 1600));
-    success(payload, serverCode);
-  } catch (err) {
-    cta.disabled = false; cta.textContent = 'Complete registration';
-    toast(err.userMsg || 'Could not submit. Check your connection and try again.'); Snd.err();
-  }
-});
-
-function success(p, serverCode) {
-  const code = serverCode || ('SPOOK-' + Math.random().toString(36).slice(2, 7).toUpperCase());
-  $('#t-name').textContent = p.fullName; $('#t-sid').textContent = p.enrollmentNumber; $('#t-course').textContent = p.course;
-  $('#t-year').textContent = ['', '1st', '2nd', '3rd', '4th'][p.academicYear] + ' Year, Semester ' + p.semester; $('#t-code').textContent = code;
-  const r = fw.getBoundingClientRect();
-  Snd.thunder(); Snd.shriek(.14);
-  const tl = gsap.timeline();
-  tl.to(form, { autoAlpha: 0, y: -12, duration: .35 })
-    .add(() => { form.hidden = true; ticket.hidden = false; FX.burst(r.left + r.width / 2, r.top + 160, 110); ghostPass(true); })
-    .fromTo(ticket, { autoAlpha: 0, scale: .94 }, { autoAlpha: 1, scale: 1, duration: .7, ease: 'back.out(1.6)' })
-    .add(() => ticket.focus({ preventScroll: true }));
-  if (!RM) gsap.fromTo('#flick', { opacity: .5 }, { opacity: 0, duration: .6 });
-}
-$('#again').addEventListener('click', () => {
-  form.reset(); fillSem(0); touched.clear(); ids.forEach(paint); lastN = 0; candles();
-  cta.disabled = false; cta.textContent = 'Complete registration';
-  ticket.hidden = true; form.hidden = false; gsap.set(form, { autoAlpha: 1, y: 0 });
-  E.name.focus({ preventScroll: true });
-});
-fillSem(0); ids.forEach(paint); candles();
+const cEls=$$('.candle'); let lastN=0;
+function syncConditional(){const other=E.course.value==='Other',pair=E.teamSize.value==='2';$('#otherCourseField').hidden=!other;E.otherCourse.disabled=!other;E.otherCourse.required=other;$('#member2Fields').hidden=!pair;['member2Name','member2Phone','member2Email'].forEach(id=>{E[id].disabled=!pair;E[id].required=pair;});}
+function shake(f){f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');}
+function paint(id){const el=E[id],f=el.closest('.field'),m=$('#m-'+id),msg=rules[id](el.value),bad=!!msg&&touched.has(id),was=f.classList.contains('bad');f.classList.toggle('ok',!msg);f.classList.toggle('bad',bad);el.setAttribute('aria-invalid',bad?'true':'false');m.textContent=bad?msg:(f.dataset.hint||'');if(bad&&!was&&!RM)shake(f);}
+function candles(){const active=activeIds(),n=active.filter(id=>!rules[id](E[id].value)).length,total=active.length;cEls.forEach((c,i)=>c.classList.toggle('lit',i<Math.round(7*n/total)));if(n>lastN)Snd.blip();lastN=n;$('#progress').textContent=`${n} of ${total} details done`;$('#ctaWrap').classList.toggle('ready',n===total);}
+function clean(id){const el=E[id];if(id==='sid')el.value=el.value.replace(/[^A-Za-z0-9/-]/g,'').slice(0,32);if(id==='phone'||id==='member2Phone'){let d=el.value.replace(/\D/g,'');if(d.length>10&&d.startsWith('91'))d=d.slice(2);if(d.length===11&&d.startsWith('0'))d=d.slice(1);el.value=d.slice(0,10);}}
+const inkDrop=el=>{if(RM)return;const ctl=el.closest('.control'),d=document.createElement('i');d.className='ink';d.style.left=rand(20,80)+'%';ctl.appendChild(d);gsap.fromTo(d,{y:0,opacity:.9},{y:18,opacity:0,duration:.9,ease:'power2.in',onComplete:()=>d.remove()});};
+ids.forEach(id=>{const el=E[id];el.addEventListener('input',()=>{clean(id);if(touched.has(id)||!rules[id](el.value))paint(id);candles();});el.addEventListener('change',()=>{if(id==='course'||id==='teamSize'){syncConditional();['otherCourse','member2Name','member2Phone','member2Email'].forEach(paint);}if(touched.has(id)||!rules[id](el.value))paint(id);candles();});el.addEventListener('blur',()=>{if(el.value||touched.has(id)){touched.add(id);paint(id);}});el.addEventListener('focus',()=>inkDrop(el));});
+let toastTween;function toast(msg){const t=$('#toast');t.textContent=msg;if(toastTween)toastTween.kill();toastTween=gsap.timeline().to(t,{y:0,opacity:1,duration:.35,ease:'power3.out'}).to(t,{y:30,opacity:0,duration:.4,delay:3});}
+const form=$('#regForm'),cta=$('#cta'),ticket=$('#ticket');
+form.addEventListener('submit',async e=>{e.preventDefault();syncConditional();const active=activeIds();active.forEach(id=>{touched.add(id);paint(id);});const badId=active.find(id=>rules[id](E[id].value));if(badId){$$('.field.bad').forEach(shake);Snd.err();toast('Fix the highlighted fields to continue.');E[badId].focus({preventScroll:true});E[badId].scrollIntoView({behavior:RM||LOW_POWER?'auto':'smooth',block:'center'});return;}if(E.teamSize.value==='2'&&E.member2Email.value.trim().toLowerCase()===E.email.value.trim().toLowerCase()){touched.add('member2Email');paint('member2Email');toast('Each team member must use a different email.');E.member2Email.focus();return;}
+  const teamSize=Number(E.teamSize.value),course=E.course.value==='Other'?E.otherCourse.value.trim():E.course.value;
+  const payload={fullName:E.name.value.trim(),enrollmentNumber:E.sid.value.trim(),phone:'+91'+E.phone.value,email:E.email.value.trim(),course:E.course.value,otherCourse:E.course.value==='Other'?course:'',academicYear:Number(E.year.value),teamSize};
+  if(teamSize===2)payload.member2={fullName:E.member2Name.value.trim(),phone:'+91'+E.member2Phone.value,email:E.member2Email.value.trim()};
+  cta.disabled=true;cta.textContent='Writing your name…';try{let serverCode=null;if(ENDPOINT){const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),20000);let r;try{r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});}finally{clearTimeout(timeout);}const data=await r.json().catch(()=>({}));if(!r.ok){const er=new Error(data.error||'HTTP '+r.status);er.userMsg=data.error;throw er;}serverCode=data.code||null;}else await new Promise(r=>setTimeout(r,1600));success(payload,serverCode,course);}catch(err){cta.disabled=false;cta.textContent='Complete registration';toast(err.userMsg||(err.name==='AbortError'?'Connection timed out. Check your internet and try again.':'Could not submit. Check your connection and try again.'));Snd.err();}});
+function success(p,serverCode,resolvedCourse){const code=serverCode||('SPOOK-'+Math.random().toString(36).slice(2,7).toUpperCase());$('#t-name').textContent=p.fullName;$('#t-sid').textContent=p.enrollmentNumber;$('#t-course').textContent=resolvedCourse;$('#t-year').textContent=['','1st','2nd','3rd','4th'][p.academicYear]+' Year';$('.ticket-member2').hidden=p.teamSize!==2;$('#t-member2').hidden=p.teamSize!==2;if(p.teamSize===2)$('#t-member2').textContent=p.member2.fullName;$('#t-code').textContent=code;const r=fw.getBoundingClientRect();Snd.thunder();Snd.shriek(.14);const tl=gsap.timeline();tl.to(form,{autoAlpha:0,y:-12,duration:.35}).add(()=>{form.hidden=true;ticket.hidden=false;FX.burst(r.left+r.width/2,r.top+160,110);ghostPass(true);}).fromTo(ticket,{autoAlpha:0,scale:.94},{autoAlpha:1,scale:1,duration:.7,ease:'back.out(1.6)'}).add(()=>ticket.focus({preventScroll:true}));if(!RM)gsap.fromTo('#flick',{opacity:.5},{opacity:0,duration:.6});}
+$('#again').addEventListener('click',()=>{form.reset();syncConditional();touched.clear();ids.forEach(paint);lastN=0;candles();cta.disabled=false;cta.textContent='Complete registration';ticket.hidden=true;form.hidden=false;gsap.set(form,{autoAlpha:1,y:0});E.name.focus({preventScroll:true});});
+syncConditional();ids.forEach(paint);candles();
 
 /* =========================================================
    EVENT COUNTDOWN
