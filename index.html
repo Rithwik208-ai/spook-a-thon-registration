@@ -815,7 +815,7 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
         !courseChoice ? ['course','Choose your course.'] :
         courseChoice === 'Other' && otherCourse.length < 2 ? ['otherCourse','Enter your course or programme.'] :
         ![1,2,3,4].includes(year) ? ['year','Choose your academic year.'] :
-        teamSize === 2 && member2Name.length < 3 ? ['member2Name','Enter the second member’s full name.'] :
+        teamSize === 2 && (member2Name.length < 3 || !/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(member2Name)) ? ['member2Name','Enter a valid full name for team member 2.'] :
         teamSize === 2 && !/^[6-9]\d{9}$/.test(member2Phone) ? ['member2Phone','Enter a valid 10-digit Indian mobile number.'] :
         teamSize === 2 && !emailOK(member2Email) ? ['member2Email','Enter a valid personal or school email address.'] :
         teamSize === 2 && member2Email.toLowerCase() === email.toLowerCase() ? ['member2Email','Each team member must use a different email.'] : null;
@@ -1256,7 +1256,7 @@ const rules = {
   email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())?'':'Enter a valid personal or school email address.',
   course:v=>v?'':'Choose your course.',year:v=>v?'':'Choose your academic year.',teamSize:v=>['1','2'].includes(v)?'':'Choose a team size.',
   otherCourse:v=>v.trim().length>=2?'':'Enter your course or programme.',
-  member2Name:v=>v.trim().length>=3?'':'Enter the second member’s full name.',member2Phone:v=>/^[6-9]\d{9}$/.test(v)?'':'Enter a valid 10-digit Indian mobile number.',
+  member2Name:v=>{v=v.trim();return v.length>=3&&/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(v)?'':'Enter a valid full name for team member 2.';},member2Phone:v=>/^[6-9]\d{9}$/.test(v)?'':'Enter a valid 10-digit Indian mobile number.',
   member2Email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())?'':'Enter a valid personal or school email address.'
 };
 const cEls=$$('.candle'); let lastN=0;
