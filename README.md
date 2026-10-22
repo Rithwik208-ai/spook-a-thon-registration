@@ -26,3 +26,14 @@ Postgres unique constraints protect against duplicate enrollment numbers/emails 
 
 `POST /api/register` with JSON fields `fullName`, `enrollmentNumber` (1–32 letters, numbers, slash, or hyphen; legacy `studentId` is also accepted), `phone` (`+91XXXXXXXXXX`), `email`, `course`, `academicYear` (1–4), `teamSize` (1 or 2), and, for a two-person team, `member2: { fullName, phone, email }`. Use `course: "Other"` with `otherCourse` to submit a custom course. Personal email addresses are accepted; semester is not required. Success returns `201 { ok: true, code }`; invalid submissions return `400`, duplicates `409`, and temporary service errors `503`.
 
+
+## Admin portal
+
+The private admin page is available at `/admin.html`. It supports registration review, editing, deletion, and a paginated export of all rows as an Excel-compatible CSV. Admin requests are authorized on the server with a Supabase Auth access token and the `ADMIN_EMAILS` allowlist; the database secret is never sent to the browser.
+
+To enable it, run the current `supabase-schema.sql` in the Supabase SQL Editor, create and verify an admin user under **Authentication → Users**, then add these Vercel Production environment variables and redeploy:
+
+- `SUPABASE_PUBLISHABLE_KEY`: the project's publishable key (safe for browser sign-in; never use the secret key here).
+- `ADMIN_EMAILS`: one or more exact admin account emails, separated by commas.
+
+The existing server-side `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) are used for database access. Only allow trusted administrators.
