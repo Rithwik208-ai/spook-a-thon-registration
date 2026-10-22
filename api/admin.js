@@ -93,9 +93,25 @@ module.exports = async function handler(req, res) {
     };
 
     if (req.method === 'GET') {
+      const select = 'id,full_name,student_id,phone,email,course,academic_year,semester,team_size,member2_name,member2_phone,member2_email,registration_code,created_at';
+      const enrollmentNumber = url.searchParams.get('enrollmentNumber');
+      if (enrollmentNumber !== null) {
+        if (!ENROLLMENT.test(enrollmentNumber)) return send(res, 400, { error: 'Enter a valid enrollment number.' });
+        const query = new URLSearchParams({ select, student_id: `eq.${enrollmentNumber}`, order: 'created_at.desc,id.desc' });
+        const response = await fetch(`${cfg.url}/rest/v1/registrations?${query}`, {
+          headers: { ...headers, Range: '0-99', 'Range-Unit': 'items', Prefer: 'count=exact' }
+        });
+        const rows = await response.json().catch(() => []);
+        if (!response.ok) {
+          console.error('Admin enrollment lookup failed:', response.status);
+          return send(res, 500, { error: 'Could not find this enrollment. Check that the registration schema migration has been applied.' });
+        }
+        const range = response.headers.get('content-range') || '';
+        const total = Number((range.split('/')[1] || '').replace('*', '')) || 0;
+        return send(res, 200, { rows, total, offset: 0, limit: 100 });
+      }
       const offset = Math.max(0, Number.parseInt(url.searchParams.get('offset') || '0', 10) || 0);
       const limit = Math.min(200, Math.max(1, Number.parseInt(url.searchParams.get('limit') || '100', 10) || 100));
-      const select = 'id,full_name,student_id,phone,email,course,academic_year,semester,team_size,member2_name,member2_phone,member2_email,registration_code,created_at';
       const response = await fetch(`${cfg.url}/rest/v1/registrations?select=${select}&order=created_at.desc,id.desc`, {
         headers: { ...headers, Range: `${offset}-${offset + limit - 1}`, 'Range-Unit': 'items', Prefer: 'count=exact' }
       });
