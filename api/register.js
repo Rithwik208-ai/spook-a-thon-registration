@@ -21,8 +21,12 @@ module.exports = async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
+  // Supabase's newer sb_secret_ keys are valid for server-side REST calls,
+  // but unlike legacy service_role JWTs they must not be sent as Bearer tokens.
+  const secretKey = process.env.SUPABASE_SECRET_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
+  const apiKey = secretKey || serviceKey;
+  if (!supabaseUrl || !apiKey) {
     console.error('Missing Supabase environment configuration.');
     return send(res, 503, { error: 'Registration is temporarily unavailable. Please try again soon.' });
   }
@@ -39,7 +43,7 @@ module.exports = async function handler(req, res) {
   }
 
   const fullName = String(body.fullName || '').trim().replace(/\s+/g, ' ');
-  const studentId = String(body.studentId || '').trim();
+  const enrollmentNumber = String(body.enrollmentNumber ?? body.studentId ?? '').trim();
   const phone = String(body.phone || '').replace(/[\s()-]/g, '');
   const email = String(body.email || '').trim().toLowerCase();
   const course = String(body.course || '').trim();
@@ -47,7 +51,7 @@ module.exports = async function handler(req, res) {
   const semester = Number(body.semester);
 
   if (fullName.length < 3 || fullName.length > 100 || !/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(fullName)) return send(res, 400, { error: 'Enter a valid full name.' });
-  if (!/^\d{11}$/.test(studentId)) return send(res, 400, { error: 'Student ID must be exactly 11 digits.' });
+  if (!/^\d{11}$/.test(enrollmentNumber)) return send(res, 400, { error: 'Enrollment number must be exactly 11 digits.' });
   if (!/^\+91[6-9]\d{9}$/.test(phone)) return send(res, 400, { error: 'Enter a valid 10-digit Indian mobile number.' });
   if (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return send(res, 400, { error: 'Enter a valid email address.' });
   if (!COURSES.has(course)) return send(res, 400, { error: 'Choose a valid course.' });
@@ -57,7 +61,7 @@ module.exports = async function handler(req, res) {
   const registrationCode = `SPOOK-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
   const row = {
     full_name: fullName,
-    student_id: studentId,
+    student_id: enrollmentNumber,
     phone,
     email,
     course,
@@ -70,8 +74,8 @@ module.exports = async function handler(req, res) {
     const response = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/registrations`, {
       method: 'POST',
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        apikey: apiKey,
+        ...(secretKey ? {} : { Authorization: `Bearer ${serviceKey}` }),
         'Content-Type': 'application/json',
         Prefer: 'return=minimal'
       },
@@ -85,7 +89,7 @@ module.exports = async function handler(req, res) {
     const dbError = await response.json().catch(() => ({}));
     if (response.status === 409 || dbError.code === '23505') {
       const duplicate = `${dbError.message || ''} ${dbError.details || ''}`;
-      const field = /email/i.test(duplicate) ? 'email address' : 'student ID';
+      const field = /email/i.test(duplicate) ? 'email address' : 'enrollment number';
       return send(res, 409, { error: `This ${field} is already registered.` });
     }
 
