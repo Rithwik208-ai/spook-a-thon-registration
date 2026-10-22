@@ -1,6 +1,6 @@
 # Spook-a-thon Registration
 
-A static Halloween event site with a Vercel serverless registration endpoint and Supabase Postgres storage. The endpoint validates each submission on the server, stores no secrets in browser code, and enforces unique student ID, email, and registration code constraints in Postgres. The schema is ready for 1,000+ registrations; actual service capacity depends on the Supabase and Vercel plans and event traffic.
+A static Halloween event site with a Vercel serverless registration endpoint and Supabase Postgres storage. The endpoint validates each submission on the server, stores no secrets in browser code, and enforces unique 11-digit enrollment number, email, and registration code constraints in Postgres. The schema is ready for 1,000+ registrations; actual service capacity depends on the Supabase and Vercel plans and event traffic.
 
 ## One-time Supabase setup
 
@@ -20,9 +20,9 @@ For local preview, use Vercel CLI (`vercel dev`) after creating a local `.env` f
 
 ## Capacity and privacy
 
-Postgres unique constraints protect against duplicate student IDs/emails even during concurrent submissions. The form stores name, student ID, phone, email, course, year, semester, registration code, and server timestamp. Limit dashboard and secret-key access to trusted event admins. Supabase Free currently becomes read-only above 500 MB of database data; check current plan limits and choose a paid plan if the event traffic, retention, uptime, or support needs require it.
+Postgres unique constraints protect against duplicate enrollment numbers/emails even during concurrent submissions. The form stores name, enrollment number (in the existing `student_id` database column), phone, email, course, year, semester, registration code, and server timestamp. Limit dashboard and secret-key access to trusted event admins. Supabase Free currently becomes read-only above 500 MB of database data; check current plan limits and choose a paid plan if the event traffic, retention, uptime, or support needs require it.
 
 ## API
 
-`POST /api/register` with JSON fields `fullName`, `studentId`, `phone` (`+91XXXXXXXXXX`), `email`, `course`, `academicYear` (1–4), and `semester`. Success returns `201 { ok: true, code }`; invalid submissions return `400`, duplicates `409`, and temporary service errors `503`.
+`POST /api/register` with JSON fields `fullName`, `enrollmentNumber` (11 digits; legacy `studentId` is also accepted), `phone` (`+91XXXXXXXXXX`), `email`, `course`, `academicYear` (1–4), and `semester`. Success returns `201 { ok: true, code }`; invalid submissions return `400`, duplicates `409`, and temporary service errors `503`.
 

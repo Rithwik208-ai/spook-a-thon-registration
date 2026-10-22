@@ -615,8 +615,8 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
               </div>
 
               <div class="field" data-hint="Exactly 11 digits, numbers only.">
-                <label for="sid">Student ID<b aria-hidden="true">*</b></label>
-                <div class="control"><input id="sid" name="sid" type="text" inputmode="numeric" autocomplete="off" placeholder="11-digit student ID" required aria-describedby="m-sid"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
+                <label for="sid">Enrollment number<b aria-hidden="true">*</b></label>
+                <div class="control"><input id="sid" name="sid" type="text" inputmode="numeric" autocomplete="off" maxlength="11" pattern="[0-9]{11}" placeholder="11-digit enrollment number" required aria-describedby="m-sid"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div>
                 <p class="msg" id="m-sid">Exactly 11 digits, numbers only.</p>
               </div>
 
@@ -708,7 +708,7 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
               <p>Your name is in the register. Screenshot this pass and keep it handy.</p>
               <dl>
                 <dt>Name</dt><dd id="t-name"></dd>
-                <dt>Student ID</dt><dd id="t-sid"></dd>
+                <dt>Enrollment number</dt><dd id="t-sid"></dd>
                 <dt>Course</dt><dd id="t-course"></dd>
                 <dt>Year</dt><dd id="t-year"></dd>
                 <dt>Pass code</dt><dd><span class="code" id="t-code"></span></dd>
@@ -796,14 +796,14 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
       const name = field('name').value.trim(), sid = field('sid').value.replace(/\D/g, ''), phone = field('phone').value.replace(/\D/g, '');
       const email = field('email').value.trim(), course = field('course').value, year = Number(field('year').value), semester = Number(field('sem').value);
       const invalid = name.length < 3 ? ['name', 'Enter your full name, at least 3 characters.'] :
-        !/^\d{11}$/.test(sid) ? ['sid', 'Student ID must be exactly 11 digits.'] :
+        !/^\d{11}$/.test(sid) ? ['sid', 'Enrollment number must be exactly 11 digits.'] :
         !/^[6-9]\d{9}$/.test(phone) ? ['phone', 'Enter a valid 10-digit Indian mobile number.'] : null;
       if (invalid) { field(invalid[0]).focus(); notify(invalid[1]); return; }
       field('phone').value = phone; button.disabled = true; button.textContent = 'Writing your name…';
       const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 20000);
       try {
         const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-          body: JSON.stringify({ fullName: name, studentId: sid, phone: '+91' + phone, email, course, academicYear: year, semester }) });
+          body: JSON.stringify({ fullName: name, enrollmentNumber: sid, phone: '+91' + phone, email, course, academicYear: year, semester }) });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Registration could not be saved. Please try again.');
         field('t-name').textContent = name; field('t-sid').textContent = sid; field('t-course').textContent = course;
@@ -1227,7 +1227,7 @@ const E = {}; ids.forEach(id => E[id] = $('#' + id));
 const touched = new Set();
 const rules = {
   name: v => { v = v.trim(); if (!v) return 'Enter your full name.'; if (v.length < 3) return 'Enter your full name, at least 3 characters.'; if (!/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(v)) return 'Use letters, spaces, dots, apostrophes and hyphens only.'; return ''; },
-  sid: v => /^\d{11}$/.test(v) ? '' : 'Student ID must be exactly 11 digits, numbers only.',
+  sid: v => /^\d{11}$/.test(v) ? '' : 'Enrollment number must be exactly 11 digits, numbers only.',
   phone: v => /^[6-9]\d{9}$/.test(v) ? '' : (v.length !== 10 ? 'Enter your 10-digit Indian mobile number.' : 'Indian mobile numbers start with 6, 7, 8 or 9.'),
   email: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? '' : 'Enter a valid email address, like name@example.com.',
   course: v => v ? '' : 'Choose your course.',
@@ -1299,7 +1299,7 @@ form.addEventListener('submit', async e => {
     return;
   }
   const payload = {
-    fullName: E.name.value.trim(), studentId: E.sid.value, phone: '+91' + E.phone.value, email: E.email.value.trim(),
+    fullName: E.name.value.trim(), enrollmentNumber: E.sid.value, phone: '+91' + E.phone.value, email: E.email.value.trim(),
     course: E.course.value, academicYear: E.year.value, semester: E.sem.value, submittedAt: new Date().toISOString()
   };
   cta.disabled = true; cta.textContent = 'Writing your name…';
@@ -1324,7 +1324,7 @@ form.addEventListener('submit', async e => {
 
 function success(p, serverCode) {
   const code = serverCode || ('SPOOK-' + Math.random().toString(36).slice(2, 7).toUpperCase());
-  $('#t-name').textContent = p.fullName; $('#t-sid').textContent = p.studentId; $('#t-course').textContent = p.course;
+  $('#t-name').textContent = p.fullName; $('#t-sid').textContent = p.enrollmentNumber; $('#t-course').textContent = p.course;
   $('#t-year').textContent = ['', '1st', '2nd', '3rd', '4th'][p.academicYear] + ' Year, Semester ' + p.semester; $('#t-code').textContent = code;
   const r = fw.getBoundingClientRect();
   Snd.thunder(); Snd.shriek(.14);

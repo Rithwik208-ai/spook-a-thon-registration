@@ -15,6 +15,8 @@ create table if not exists public.registrations (
 
 create index if not exists registrations_created_at_idx on public.registrations (created_at desc);
 
+comment on column public.registrations.student_id is '11-digit enrollment number';
+
 alter table public.registrations enable row level security;
 revoke all on table public.registrations from public, anon, authenticated;
 grant all on table public.registrations to service_role;
