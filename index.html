@@ -8,7 +8,8 @@
 <title>Spook-a-thon | Registration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --void:#080203; --blood:#e5281a; --deep:#7a0f0c; --ember:#ff7a1a;
@@ -434,6 +435,70 @@ footer{position:relative;z-index:5;text-align:center;padding:1rem 1rem 3rem;colo
 .drip::after{background:inherit;box-shadow:inset 2px 0 4px rgba(255,40,62,.18),0 3px 8px rgba(20,0,0,.25)}
 @media(prefers-reduced-motion:reduce){#blood .blood-run{display:none}}
 
+/* Phone browser polish: dynamic viewport, safe areas, and comfortable touch targets. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh}
+body.lock{height:100vh;height:100dvh;overscroll-behavior:none}
+#intro{height:100vh;height:100dvh}
+#introStage{padding:max(1.5rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) max(1.5rem,env(safe-area-inset-bottom)) max(1rem,env(safe-area-inset-left))}
+button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+@media(max-width:600px){
+  .top{padding-top:max(.75rem,env(safe-area-inset-top));padding-right:max(1rem,env(safe-area-inset-right));padding-left:max(1rem,env(safe-area-inset-left))}
+  .stage{padding-right:max(1rem,env(safe-area-inset-right));padding-bottom:calc(3rem + env(safe-area-inset-bottom));padding-left:max(1rem,env(safe-area-inset-left));row-gap:2.25rem}
+  .hero-row{grid-template-columns:minmax(88px,32vw) minmax(0,1fr);gap:.8rem}
+  .title{max-width:100%;white-space:normal;font-size:clamp(2.3rem,10.5vw,4rem);line-height:.96;text-wrap:balance}
+  .facts{min-width:0;overflow-wrap:anywhere}
+  .f-date{font-size:clamp(1.55rem,7vw,2.25rem)}
+  .panel-in{padding:1.7rem clamp(.9rem,4vw,1.35rem) calc(1.4rem + env(safe-area-inset-bottom))}
+  .control input,.control select{min-height:48px;font-size:16px}
+  .field label{font-size:1rem}
+  .cta{min-height:52px}
+  .sound,.gbtn{min-height:44px}
+  .gate{padding-top:max(1.5rem,env(safe-area-inset-top));padding-bottom:max(1.5rem,env(safe-area-inset-bottom));padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right))}
+  .intro-door{height:min(52dvh,390px)}
+}
+
+@media (pointer:coarse) and (max-width:800px){
+  .grain{opacity:.035;animation:none}
+  .gate{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .grave-mist,.door-glow{filter:none}
+  .formwrap{filter:none}
+  .intro-stage::before{animation:none}
+}
+
+/* Small screens and power-limited devices */
+@media(max-width:380px){
+  body{font-size:1rem}
+  .hero-row{grid-template-columns:minmax(76px,27vw) minmax(0,1fr);gap:.65rem}
+  .title{font-size:clamp(2rem,10vw,2.65rem);letter-spacing:-.025em}
+  .badge{gap:.45rem}.badge strong{font-size:.82rem}
+  .count-grid strong{font-size:1.25rem}
+  .cta{font-size:1.18rem;white-space:nowrap}
+  .panel-in{padding-right:.8rem;padding-left:.8rem}
+}
+@media(max-height:620px) and (orientation:landscape){
+  #introStage{min-height:100dvh}
+  .intro-door{height:min(58dvh,320px);top:49%}
+  #introTitle{top:-7%;font-size:clamp(2.5rem,8vw,5rem)}
+  #l1,#l2{top:40%}
+  .gate{padding-top:max(.5rem,env(safe-area-inset-top));padding-bottom:max(.5rem,env(safe-area-inset-bottom))}
+  .stage{padding-top:1rem;padding-bottom:2rem;row-gap:1.5rem}
+}
+@media(prefers-reduced-data:reduce){
+  .grain,.grave-mist{display:none!important}
+}
+.low-effects .grain,.low-effects .grave-mist,.low-effects #watchers,.low-effects #ghost{display:none!important}
+.low-effects .reaper,.low-effects .countdown,.low-effects .count-grid strong,
+.low-effects #blood .blood-sheet::after,.low-effects .witch-perch{animation:none!important}
+.low-effects .intro-stage::before{animation:none!important}
+.low-effects #fx{display:none!important}
+.low-effects .formwrap::before,.low-effects .form-head::after,.low-effects .gate::before,
+.low-effects .gate::after,.low-effects .door-glow,.low-effects .spider svg,
+.low-effects .pumpkin .halo,.low-effects .gflame{animation:none!important;filter:none!important}
+.low-effects .formwrap::before{opacity:.22}
+.low-effects .lvl{filter:none!important}
+
 </style>
 <noscript><style>#intro{display:none}#app{visibility:visible}</style></noscript>
 </head>
@@ -702,6 +767,62 @@ footer{position:relative;z-index:5;text-align:center;padding:1rem 1rem 3rem;colo
 </div>
 <div id="blood" aria-hidden="true"></div>
 
+<script>
+(() => {
+  const showFallback = () => {
+    if (window.__spookFallbackActive) return;
+    window.__spookFallbackActive = true;
+    clearTimeout(window.__spookFallbackTimer);
+    document.documentElement.classList.add('low-effects');
+    const intro = document.getElementById('intro'), app = document.getElementById('app'), form = document.getElementById('regForm');
+    intro.style.display = 'none'; app.style.visibility = 'visible'; document.body.classList.remove('lock');
+    document.getElementById('sound').hidden = true; document.getElementById('dark').hidden = true; document.getElementById('flick').hidden = true;
+    const toast = document.getElementById('toast'), button = document.getElementById('cta'), ticket = document.getElementById('ticket');
+    const field = id => document.getElementById(id);
+    let toastTimer;
+    const notify = message => {
+      toast.textContent = message; toast.style.opacity = '1'; toast.style.transform = 'translate(-50%,0)';
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%,30px)'; }, 5000);
+    };
+    field('year').addEventListener('change', () => {
+      const year = Number(field('year').value), sem = field('sem'); sem.replaceChildren(new Option('Choose semester', '', true, true));
+      sem.options[0].disabled = true; sem.options[0].hidden = true;
+      if (year) { [2 * year - 1, 2 * year].forEach(n => sem.add(new Option('Semester ' + n, String(n)))); sem.disabled = false; }
+      else sem.disabled = true;
+    });
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const name = field('name').value.trim(), sid = field('sid').value.replace(/\D/g, ''), phone = field('phone').value.replace(/\D/g, '');
+      const email = field('email').value.trim(), course = field('course').value, year = Number(field('year').value), semester = Number(field('sem').value);
+      const invalid = name.length < 3 ? ['name', 'Enter your full name, at least 3 characters.'] :
+        !/^\d{11}$/.test(sid) ? ['sid', 'Student ID must be exactly 11 digits.'] :
+        !/^[6-9]\d{9}$/.test(phone) ? ['phone', 'Enter a valid 10-digit Indian mobile number.'] : null;
+      if (invalid) { field(invalid[0]).focus(); notify(invalid[1]); return; }
+      field('phone').value = phone; button.disabled = true; button.textContent = 'Writing your name…';
+      const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
+          body: JSON.stringify({ fullName: name, studentId: sid, phone: '+91' + phone, email, course, academicYear: year, semester }) });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Registration could not be saved. Please try again.');
+        field('t-name').textContent = name; field('t-sid').textContent = sid; field('t-course').textContent = course;
+        field('t-year').textContent = ['', '1st', '2nd', '3rd', '4th'][year] + ' Year, Semester ' + semester; field('t-code').textContent = data.code || 'Registered';
+        form.hidden = true; ticket.hidden = false; ticket.focus();
+      } catch (error) {
+        notify(error.name === 'AbortError' ? 'Connection timed out. Check your internet and try again.' : error.message);
+        button.disabled = false; button.textContent = 'Complete registration';
+      } finally { clearTimeout(timeout); }
+    });
+    field('again').addEventListener('click', () => {
+      ticket.hidden = true; form.hidden = false; form.reset(); field('sem').replaceChildren(new Option('Choose year first', '', true, true)); field('sem').disabled = true;
+      button.disabled = false; button.textContent = 'Complete registration';
+    });
+  };
+  window.__spookShowFallback = showFallback;
+  window.__spookFallbackTimer = setTimeout(() => { if (!window.gsap || !window.ScrollTrigger) showFallback(); }, 5000);
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
@@ -715,10 +836,15 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const rand = (a, b) => a + Math.random() * (b - a);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NET = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+const LOW_POWER = matchMedia('(pointer: coarse)').matches || (navigator.deviceMemory && navigator.deviceMemory <= 4) || !!(NET && NET.saveData);
+document.documentElement.classList.toggle('low-effects', LOW_POWER);
 const app = $('#app'), intro = $('#intro');
 
-if (!window.gsap) { // CDN blocked: show the portal without the show
-  intro.style.display = 'none'; app.style.visibility = 'visible'; document.body.classList.remove('lock');
+if (window.__spookFallbackActive) return;
+clearTimeout(window.__spookFallbackTimer);
+if (!window.gsap || !window.ScrollTrigger) {
+  window.__spookShowFallback();
   return;
 }
 gsap.registerPlugin(window.ScrollTrigger);
@@ -949,15 +1075,18 @@ for (let i = 0; i < 7; i++) candlesEl.insertAdjacentHTML('beforeend', '<span cla
    ========================================================= */
 const FX = (() => {
   const cv = $('#fx'), c = cv.getContext('2d');
-  let W = 0, H = 0, dpr = 1, running = false;
+  const MOBILE = matchMedia('(max-width: 800px), (pointer: coarse)').matches;
+  let W = 0, H = 0, dpr = 1, running = false, started = false, lastFrame = -Infinity, loopTimer = 0;
   const blobs = [], embers = [], parts = [];
   function size() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.05 : 1.75); W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  function frame() {
+  function frame(now = 0) {
     if (!running) return;
+    if (MOBILE && now - lastFrame < 42) { loopTimer = setTimeout(() => requestAnimationFrame(frame), Math.max(8, 42 - (now - lastFrame))); return; }
+    lastFrame = now;
     c.clearRect(0, 0, W, H);
     blobs.forEach(b => {
       b.x += b.vx; if (b.x > W + b.r) b.x = -b.r; if (b.x < -b.r) b.x = W + b.r;
@@ -965,7 +1094,7 @@ const FX = (() => {
       g.addColorStop(0, `rgba(${b.col},${b.a})`); g.addColorStop(1, `rgba(${b.col},0)`);
       c.fillStyle = g; c.fillRect(b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
     });
-    if (embers.length < 70 && Math.random() < .5) embers.push({ x: Math.random() * W, y: H + 10, vy: -(.35 + Math.random() * 1.1), ph: Math.random() * 6.28, s: .7 + Math.random() * 2, l: 0, max: 300 + Math.random() * 300 });
+    if (embers.length < (MOBILE ? 8 : 50) && Math.random() < (MOBILE ? .25 : .5)) embers.push({ x: Math.random() * W, y: H + 10, vy: -(.35 + Math.random() * 1.1), ph: Math.random() * 6.28, s: .7 + Math.random() * 2, l: 0, max: 300 + Math.random() * 300 });
     c.globalCompositeOperation = 'lighter';
     for (let i = embers.length - 1; i >= 0; i--) {
       const e = embers[i]; e.l++; e.y += e.vy; e.x += Math.sin(e.l * .03 + e.ph) * .45;
@@ -985,12 +1114,15 @@ const FX = (() => {
   }
   return {
     start() {
-      if (running || RM) return; running = true; size();
-      for (let i = 0; i < 7; i++) blobs.push({ x: Math.random() * W, y: H * (.3 + Math.random() * .7), r: 260 + Math.random() * 320, vx: (Math.random() * .25 + .05) * (Math.random() < .5 ? -1 : 1), a: .045 + Math.random() * .05, col: i % 3 === 0 ? '150,150,170' : '150,26,20' });
-      addEventListener('resize', size); frame();
+      if (started || RM || LOW_POWER) return; started = true; running = !document.hidden; size();
+      for (let i = 0; i < (MOBILE ? 2 : 6); i++) blobs.push({ x: Math.random() * W, y: H * (.3 + Math.random() * .7), r: (MOBILE ? 210 : 260) + Math.random() * 280, vx: (Math.random() * .25 + .05) * (Math.random() < .5 ? -1 : 1), a: .045 + Math.random() * .05, col: i % 3 === 0 ? '150,150,170' : '150,26,20' });
+      addEventListener('resize', size, { passive: true });
+      document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) { lastFrame = -Infinity; requestAnimationFrame(frame); } else { clearTimeout(loopTimer); } });
+      if (running) requestAnimationFrame(frame);
     },
     burst(x, y, n = 60) {
       if (RM) return;
+      n = Math.min(MOBILE ? 28 : 140, Math.round(n * (MOBILE ? .38 : 1)));
       for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = rand(2, 9); parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 3, life: 50 + Math.random() * 50, s: 1 + Math.random() * 2.4, h: rand(8, 45) }); }
     }
   };
@@ -1002,11 +1134,16 @@ const FX = (() => {
 const dark = $('#dark');
 const lite = { r: 300 };
 let mx = innerWidth / 2, my = innerHeight / 3, tx = mx, ty = my;
-addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; watch(e.clientX, e.clientY); }, { passive: true });
-gsap.ticker.add(() => {
-  mx += (tx - mx) * .18; my += (ty - my) * .18;
-  dark.style.setProperty('--mx', mx + 'px'); dark.style.setProperty('--my', my + 'px'); dark.style.setProperty('--r', lite.r + 'px');
-});
+const FINE_POINTER = matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (FINE_POINTER) {
+  addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; watch(e.clientX, e.clientY); }, { passive: true });
+  gsap.ticker.add(() => {
+    mx += (tx - mx) * .18; my += (ty - my) * .18;
+    dark.style.setProperty('--mx', mx + 'px'); dark.style.setProperty('--my', my + 'px'); dark.style.setProperty('--r', lite.r + 'px');
+  });
+} else {
+  dark.style.setProperty('--mx', '50vw'); dark.style.setProperty('--my', '34vh'); dark.style.setProperty('--r', '300px');
+}
 const fw = $('#formwrap');
 fw.addEventListener('pointerenter', () => gsap.to(lite, { r: 760, duration: .6 }));
 fw.addEventListener('pointerleave', () => gsap.to(lite, { r: 300, duration: .6 }));
@@ -1155,10 +1292,10 @@ form.addEventListener('submit', async e => {
   e.preventDefault();
   ids.forEach(id => { touched.add(id); paint(id); });
   const badId = ids.find(id => rules[id](E[id].value));
-  if (badId) {
+    if (badId) {
     $$('.field.bad').forEach(shake); Snd.err();
     toast('Fix the highlighted fields to continue.');
-    E[badId].focus({ preventScroll: true }); E[badId].scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'center' });
+      E[badId].focus({ preventScroll: true }); E[badId].scrollIntoView({ behavior: RM || LOW_POWER ? 'auto' : 'smooth', block: 'center' });
     return;
   }
   const payload = {
@@ -1169,7 +1306,11 @@ form.addEventListener('submit', async e => {
   try {
     let serverCode = null;
     if (ENDPOINT) {
-      const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+      let r;
+      try { r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller.signal }); }
+      finally { clearTimeout(timeout); }
       const data = await r.json().catch(() => ({}));
       if (!r.ok) { const er = new Error(data.error || 'HTTP ' + r.status); er.userMsg = data.error; throw er; }
       serverCode = data.code || null;
@@ -1236,7 +1377,9 @@ function initScroll() {
   ScrollTrigger.refresh();
 }
 function ambient() {
-  FX.start(); startWatchers(); dangle(); pumpFlick();
+  FX.start();
+  if (LOW_POWER) return;
+  startWatchers(); dangle(); pumpFlick();
   for (let i = 0; i < 4; i++) gsap.delayedCall(i * .5, launchBat);
   gsap.delayedCall(rand(6, 10), batLoop); gsap.delayedCall(8, glitchLoop); gsap.delayedCall(rand(10, 16), powerFlicker); ghostLoop();
 }
@@ -1262,7 +1405,7 @@ function typeTo(el, text, dur) {
 }
 const introStage = $('#introStage');
 introStage.addEventListener('pointermove', e => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (RM || LOW_POWER) return;
   const r = introStage.getBoundingClientRect();
   const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
   introStage.style.setProperty('--look-x', `${(-px * 12).toFixed(1)}px`);
@@ -1271,6 +1414,7 @@ introStage.addEventListener('pointermove', e => {
   introStage.style.setProperty('--door-nod', `${(py * 2).toFixed(2)}deg`);
 });
 introStage.addEventListener('pointerleave', () => {
+  if (LOW_POWER) return;
   introStage.style.setProperty('--look-x', '0px'); introStage.style.setProperty('--look-y', '0px');
   introStage.style.setProperty('--door-tilt', '0deg'); introStage.style.setProperty('--door-nod', '0deg');
 });
