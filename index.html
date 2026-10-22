@@ -234,6 +234,10 @@ button{font:inherit;color:inherit}
 .when{color:var(--gold)}
 .ghostbtn{margin-top:1.4rem;background:none;border:1px solid #6b2018;padding:.6rem 1.1rem;cursor:pointer;transition:border-color .2s,background .2s}
 .ghostbtn:hover{border-color:var(--ember);background:rgba(255,122,26,.08)}
+.whatsapp-invite{margin:1.15rem 0 0;padding:1rem 1.1rem;border:1px solid rgba(176,25,31,.58);border-radius:4px;background:linear-gradient(135deg,rgba(90,9,16,.28),rgba(20,12,13,.82));box-shadow:inset 0 0 24px rgba(108,11,20,.12),0 0 22px rgba(116,14,20,.1)}
+.whatsapp-invite p{margin:0 0 .75rem;color:var(--bone);line-height:1.55}
+.whatsapp-link{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1rem;border:1px solid #8c2028;border-radius:3px;background:linear-gradient(135deg,#601017,#260b10);color:#fff1e8;text-decoration:none;font-weight:700;letter-spacing:.03em;transition:transform .2s,box-shadow .2s,background .2s}
+.whatsapp-link:hover,.whatsapp-link:focus-visible{transform:translateY(-2px);background:linear-gradient(135deg,#861a24,#3a0a11);box-shadow:0 0 20px rgba(164,22,34,.35);outline:2px solid #e7a29b;outline-offset:3px}
 
 footer{position:relative;z-index:5;text-align:center;padding:1rem 1rem 3rem;color:var(--ash);font-style:italic}
 
@@ -722,6 +726,10 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
                 <dt>Pass code</dt><dd><span class="code" id="t-code"></span></dd>
               </dl>
               <p class="when">29 October 2026, 2:30 PM onwards. Venue to be announced.</p>
+              <div class="whatsapp-invite">
+                <p>Join the event WhatsApp group ASAP to get updates and important event announcements.</p>
+                <a class="whatsapp-link" href="https://chat.whatsapp.com/I85DjxUmPjeEgeJzSLo0ql" target="_blank" rel="noopener noreferrer">Join the WhatsApp group <span aria-hidden="true">↗</span></a>
+              </div>
               <button type="button" class="ghostbtn" id="again">Register someone else</button>
             </div>
           </div>
