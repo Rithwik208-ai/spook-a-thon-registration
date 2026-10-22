@@ -26,7 +26,7 @@
   <main class="card hidden" id="adminPanel">
     <h1>Registrations</h1><p>Review the registration list, correct a record, remove a duplicate, or export a spreadsheet for event administration.</p>
     <div class="notice">This page contains personal contact details. Downloaded spreadsheets should be stored and shared only with event administrators.</div>
-    <div class="toolbar"><div class="status" id="count">Loading registrations…</div><div class="actions"><input class="search" id="search" type="search" placeholder="Search this page"><button class="btn ghost" id="exportButton" type="button">Export all to Excel</button><button class="btn ghost" id="refreshButton" type="button">Refresh</button><button class="btn ghost" id="logoutButton" type="button">Sign out</button></div></div>
+    <div class="toolbar"><div class="status" id="count">Loading registrations…</div><div class="actions"><input class="search" id="search" type="search" placeholder="Filter loaded rows" aria-label="Filter loaded rows"><div style="display:flex;gap:8px;flex-wrap:wrap"><input class="search" id="enrollmentLookup" type="search" placeholder="Exact enrollment number" aria-label="Exact enrollment number lookup"><button class="btn" id="lookupButton" type="button">Find enrollment</button><button class="btn ghost" id="showAllButton" type="button">Show all</button></div><button class="btn ghost" id="exportButton" type="button">Export all to Excel</button><button class="btn ghost" id="refreshButton" type="button">Refresh</button><button class="btn ghost" id="logoutButton" type="button">Sign out</button></div></div>
     <div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Enrollment</th><th>Phone</th><th>Email</th><th>Course</th><th>Year</th><th>Legacy semester</th><th>Team member 2</th><th>Pass code</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="rows"><tr><td colspan="11">Loading…</td></tr></tbody></table></div>
     <div class="pager"><span class="status" id="pageLabel"></span><div class="actions"><button class="btn ghost small" id="previous" type="button">← Previous</button><button class="btn ghost small" id="next" type="button">Next →</button></div></div>
     <p class="msg" id="adminMessage" role="status"></p>
@@ -48,7 +48,7 @@
 <script>
 (() => {
   const $ = id => document.getElementById(id), PAGE_SIZE = 100;
-  let config = null, accessToken = '', page = 0, total = 0, pageRows = [], editing = null;
+  let config = null, accessToken = '', page = 0, total = 0, pageRows = [], editing = null, lookupMode = false, lookupTimer = 0, lookupRequest = 0;
   const loginPanel = $('loginPanel'), adminPanel = $('adminPanel'), rows = $('rows');
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   async function jsonFetch(url, options = {}) {
@@ -65,21 +65,41 @@
       pageRows = data.rows || []; total = data.total || 0; renderRows();
     } catch (error) { $('adminMessage').textContent = error.message; rows.innerHTML = '<tr><td colspan="11">Could not load registrations.</td></tr>'; }
   }
+  async function lookupEnrollment() {
+    clearTimeout(lookupTimer);
+    const request = ++lookupRequest;
+    const enrollment = $('enrollmentLookup').value.trim();
+    if (!enrollment) { lookupMode = false; page = 0; return loadPage(); }
+    if (!/^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/.test(enrollment)) {
+      $('adminMessage').textContent = 'Enter a valid enrollment number (up to 32 letters or numbers).';
+      $('enrollmentLookup').focus(); return;
+    }
+    lookupMode = true; $('adminMessage').textContent = 'Looking up enrollment…';
+    $('lookupButton').disabled = true; rows.innerHTML = '<tr><td colspan="11">Finding registration…</td></tr>';
+    try {
+      const data = await jsonFetch(`/api/admin?enrollmentNumber=${encodeURIComponent(enrollment)}`, {headers:authHeaders()});
+      if (request !== lookupRequest) return;
+      pageRows = data.rows || []; total = data.total || 0; page = 0; $('search').value = ''; $('adminMessage').textContent = '';
+      renderRows();
+    } catch (error) { if(request === lookupRequest){ $('adminMessage').textContent = error.message; rows.innerHTML = '<tr><td colspan="11">Could not look up this enrollment number.</td></tr>'; } }
+    finally { if(request === lookupRequest) $('lookupButton').disabled = false; }
+  }
+  async function refreshCurrentView() { return lookupMode ? lookupEnrollment() : loadPage(); }
   function cell(tr, value) { const td = document.createElement('td'); td.textContent = value == null || value === '' ? '—' : String(value); tr.append(td); return td; }
   function renderRows() {
     const term = $('search').value.trim().toLowerCase();
     const visible = pageRows.filter(row => !term || [row.full_name,row.student_id,row.phone,row.email,row.course,row.member2_name,row.registration_code].some(value => String(value || '').toLowerCase().includes(term)));
     rows.replaceChildren();
-    if (!visible.length) { const tr=document.createElement('tr'),td=cell(tr,term?'No matches on this page.':'No registrations yet.');td.colSpan=10;rows.append(tr); }
+    if (!visible.length) { const tr=document.createElement('tr'),td=cell(tr,lookupMode?'No registration found for this enrollment number.':term?'No matches in the loaded registrations.':'No registrations yet.');td.colSpan=11;rows.append(tr); }
     visible.forEach(row => {
       const tr=document.createElement('tr'); cell(tr,row.full_name);cell(tr,row.student_id);cell(tr,row.phone);cell(tr,row.email);cell(tr,row.course);cell(tr,`${row.academic_year}${['','st','nd','rd','th'][row.academic_year]||''} Year`);cell(tr,row.semester==null?'—':row.semester);cell(tr,row.team_size===2?`${row.member2_name||''} · ${row.member2_phone||''} · ${row.member2_email||''}`:'Solo');cell(tr,row.registration_code);cell(tr,row.created_at?new Date(row.created_at).toLocaleString():'—');
       const td=document.createElement('td'),actions=document.createElement('div');actions.className='row-actions';
       const edit=document.createElement('button');edit.className='btn ghost small';edit.type='button';edit.textContent='Edit';edit.addEventListener('click',()=>openEdit(row));
       const del=document.createElement('button');del.className='btn danger small';del.type='button';del.textContent='Delete';del.addEventListener('click',()=>deleteRow(row));actions.append(edit,del);td.append(actions);tr.append(td);rows.append(tr);
     });
-    $('count').textContent = `${total.toLocaleString()} registration${total===1?'':'s'} total`;
-    const first=total?page*PAGE_SIZE+1:0,last=Math.min((page+1)*PAGE_SIZE,total);$('pageLabel').textContent=`Showing ${first.toLocaleString()}–${last.toLocaleString()}${term?' (searching this page)':''}`;
-    $('previous').disabled=page===0;$('next').disabled=(page+1)*PAGE_SIZE>=total;
+    $('count').textContent = lookupMode ? `${total.toLocaleString()} registration${total===1?'':'s'} found for this enrollment` : `${total.toLocaleString()} registration${total===1?'':'s'} total`;
+    const first=total?page*PAGE_SIZE+1:0,last=Math.min((page+1)*PAGE_SIZE,total);$('pageLabel').textContent=lookupMode?(total?'Exact enrollment lookup · 1 match':'Exact enrollment lookup · no match'):`Showing ${first.toLocaleString()}–${last.toLocaleString()}${term?' (filtered on this page)':''}`;
+    $('previous').disabled=lookupMode||page===0;$('next').disabled=lookupMode||(page+1)*PAGE_SIZE>=total;
   }
   async function login(email,password) {
     return jsonFetch(`${config.url}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:config.publishableKey,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
@@ -92,7 +112,7 @@
     finally {$('loginButton').disabled=false;}
   });
   $('logoutButton').addEventListener('click',()=>{accessToken='';pageRows=[];adminPanel.classList.add('hidden');loginPanel.classList.remove('hidden');$('loginPassword').value='';$('loginEmail').focus();});
-  $('refreshButton').addEventListener('click',loadPage);$('previous').addEventListener('click',()=>{if(page>0){page--;loadPage();}});$('next').addEventListener('click',()=>{if((page+1)*PAGE_SIZE<total){page++;loadPage();}});$('search').addEventListener('input',renderRows);
+  $('refreshButton').addEventListener('click',refreshCurrentView);$('lookupButton').addEventListener('click',lookupEnrollment);$('enrollmentLookup').addEventListener('input',()=>{clearTimeout(lookupTimer);lookupRequest++;$('lookupButton').disabled=false;const value=$('enrollmentLookup').value.trim();if(!value){if(lookupMode){lookupMode=false;page=0;loadPage();}return;}if(/^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/.test(value))lookupTimer=setTimeout(lookupEnrollment,650);});$('enrollmentLookup').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();lookupEnrollment();}});$('showAllButton').addEventListener('click',()=>{clearTimeout(lookupTimer);lookupRequest++;$('enrollmentLookup').value='';$('search').value='';lookupMode=false;page=0;loadPage();});$('previous').addEventListener('click',()=>{if(!lookupMode&&page>0){page--;loadPage();}});$('next').addEventListener('click',()=>{if(!lookupMode&&(page+1)*PAGE_SIZE<total){page++;loadPage();}});$('search').addEventListener('input',renderRows);
   $('editTeamSize').addEventListener('change',()=>{const two=$('editTeamSize').value==='2';$('editMember2').classList.toggle('hidden',!two);['editMember2Name','editMember2Phone','editMember2Email'].forEach(id=>$(id).required=two);});
   function openEdit(row) {
     editing=row; $('editMessage').textContent='';$('editName').value=row.full_name||'';$('editEnrollment').value=row.student_id||'';$('editPhone').value=row.phone||'';$('editEmail').value=row.email||'';$('editCourse').value=row.course||'';$('editYear').value=String(row.academic_year||1);$('editTeamSize').value=String(row.team_size||1);$('editMember2Name').value=row.member2_name||'';$('editMember2Phone').value=row.member2_phone||'';$('editMember2Email').value=row.member2_email||'';$('editTeamSize').dispatchEvent(new Event('change'));$('editDialog').showModal();
@@ -101,14 +121,14 @@
   $('editForm').addEventListener('submit',async event=>{
     event.preventDefault();if(!editing)return;$('saveEdit').disabled=true;$('editMessage').textContent='Saving…';
     const teamSize=Number($('editTeamSize').value), payload={full_name:$('editName').value.trim(),student_id:$('editEnrollment').value.trim(),phone:$('editPhone').value.trim(),email:$('editEmail').value.trim(),course:$('editCourse').value.trim(),academic_year:Number($('editYear').value),team_size:teamSize,member2_name:teamSize===2?$('editMember2Name').value.trim():null,member2_phone:teamSize===2?$('editMember2Phone').value.trim():null,member2_email:teamSize===2?$('editMember2Email').value.trim():null};
-    try { await jsonFetch(`/api/admin?id=${encodeURIComponent(editing.id)}`,{method:'PATCH',headers:authHeaders(true),body:JSON.stringify(payload)});$('editDialog').close();await loadPage(); }
+    try { await jsonFetch(`/api/admin?id=${encodeURIComponent(editing.id)}`,{method:'PATCH',headers:authHeaders(true),body:JSON.stringify(payload)});$('editDialog').close();await refreshCurrentView(); }
     catch(error){$('editMessage').textContent=error.message;}
     finally{$('saveEdit').disabled=false;}
   });
   async function deleteRow(row) {
     if(!window.confirm(`Delete the registration for ${row.full_name}? This cannot be undone.`))return;
     $('adminMessage').textContent='Deleting…';
-    try { await jsonFetch(`/api/admin?id=${encodeURIComponent(row.id)}`,{method:'DELETE',headers:authHeaders()});$('adminMessage').textContent='Registration deleted.';if(page>0&&pageRows.length===1)page--;await loadPage(); }
+    try { await jsonFetch(`/api/admin?id=${encodeURIComponent(row.id)}`,{method:'DELETE',headers:authHeaders()});$('adminMessage').textContent='Registration deleted.';if(!lookupMode&&page>0&&pageRows.length===1)page--;await refreshCurrentView(); }
     catch(error){$('adminMessage').textContent=error.message;}
   }
   function csvCell(value) {
