@@ -48,15 +48,27 @@ module.exports = async function handler(req, res) {
   const email = String(body.email || '').trim().toLowerCase();
   const course = String(body.course || '').trim();
   const academicYear = Number(body.academicYear);
-  const semester = Number(body.semester);
+  const teamSize = Number(body.teamSize || 1);
+  const otherCourse = String(body.otherCourse || '').trim();
+  const member2 = body.member2 && typeof body.member2 === 'object' && !Array.isArray(body.member2) ? body.member2 : {};
+  const member2Name = String(member2.fullName || '').trim().replace(/\s+/g, ' ');
+  const member2Phone = String(member2.phone || '').replace(/[\s()-]/g, '');
+  const member2Email = String(member2.email || '').trim().toLowerCase();
+  const storedCourse = course === 'Other' ? otherCourse : course;
 
   if (fullName.length < 3 || fullName.length > 100 || !/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(fullName)) return send(res, 400, { error: 'Enter a valid full name.' });
-  if (!/^\d{11}$/.test(enrollmentNumber)) return send(res, 400, { error: 'Enrollment number must be exactly 11 digits.' });
+  if (!/^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/.test(enrollmentNumber)) return send(res, 400, { error: 'Enter a valid enrollment number (up to 32 letters or numbers).' });
   if (!/^\+91[6-9]\d{9}$/.test(phone)) return send(res, 400, { error: 'Enter a valid 10-digit Indian mobile number.' });
   if (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return send(res, 400, { error: 'Enter a valid email address.' });
-  if (!COURSES.has(course)) return send(res, 400, { error: 'Choose a valid course.' });
+  if (!COURSES.has(course) || (course === 'Other' ? otherCourse.length < 2 || otherCourse.length > 100 : false)) return send(res, 400, { error: 'Choose a course or enter your course under Other.' });
   if (![1, 2, 3, 4].includes(academicYear)) return send(res, 400, { error: 'Choose a valid academic year.' });
-  if (![2 * academicYear - 1, 2 * academicYear].includes(semester)) return send(res, 400, { error: 'Choose a valid semester for your year.' });
+  if (![1, 2].includes(teamSize)) return send(res, 400, { error: 'Choose a team size of one or two members.' });
+  if (teamSize === 2) {
+    if (member2Name.length < 3 || member2Name.length > 100 || !/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(member2Name)) return send(res, 400, { error: 'Enter a valid full name for team member 2.' });
+    if (!/^\+91[6-9]\d{9}$/.test(member2Phone)) return send(res, 400, { error: 'Enter a valid 10-digit Indian mobile number for team member 2.' });
+    if (member2Email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(member2Email)) return send(res, 400, { error: 'Enter a valid email address for team member 2.' });
+    if (member2Email === email) return send(res, 400, { error: 'Each team member must use a different email address.' });
+  }
 
   const registrationCode = `SPOOK-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
   const row = {
@@ -64,9 +76,12 @@ module.exports = async function handler(req, res) {
     student_id: enrollmentNumber,
     phone,
     email,
-    course,
+    course: storedCourse,
     academic_year: academicYear,
-    semester,
+    team_size: teamSize,
+    member2_name: teamSize === 2 ? member2Name : null,
+    member2_phone: teamSize === 2 ? member2Phone : null,
+    member2_email: teamSize === 2 ? member2Email : null,
     registration_code: registrationCode
   };
 
@@ -89,7 +104,7 @@ module.exports = async function handler(req, res) {
     const dbError = await response.json().catch(() => ({}));
     if (response.status === 409 || dbError.code === '23505') {
       const duplicate = `${dbError.message || ''} ${dbError.details || ''}`;
-      const field = /email/i.test(duplicate) ? 'email address' : 'enrollment number';
+      const field = /member2_email/i.test(duplicate) ? 'team member 2 email address' : /email/i.test(duplicate) ? 'email address' : 'enrollment number';
       return send(res, 409, { error: `This ${field} is already registered.` });
     }
 
