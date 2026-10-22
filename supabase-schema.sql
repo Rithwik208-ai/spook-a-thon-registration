@@ -39,3 +39,9 @@ create unique index if not exists registrations_member2_email_key on public.regi
 alter table public.registrations enable row level security;
 revoke all on table public.registrations from public, anon, authenticated;
 grant all on table public.registrations to service_role;
+alter table public.registrations drop constraint if exists registrations_member2_complete_check;
+alter table public.registrations add constraint registrations_member2_complete_check check (
+  (team_size = 1 and member2_name is null and member2_phone is null and member2_email is null)
+  or
+  (team_size = 2 and char_length(member2_name) between 3 and 100 and member2_phone ~ '^\+91[6-9]\d{9}$' and member2_email ~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$')
+);
