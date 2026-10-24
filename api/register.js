@@ -42,6 +42,7 @@ module.exports = async function handler(req, res) {
     return send(res, 413, { error: 'Registration data is too large.' });
   }
 
+  const teamName = String(body.teamName || body.fullName || '').trim().replace(/\s+/g, ' ');
   const fullName = String(body.fullName || '').trim().replace(/\s+/g, ' ');
   const enrollmentNumber = String(body.enrollmentNumber ?? body.studentId ?? '').trim();
   const phone = String(body.phone || '').replace(/[\s()-]/g, '');
@@ -56,6 +57,7 @@ module.exports = async function handler(req, res) {
   const member2Email = String(member2.email || '').trim().toLowerCase();
   const storedCourse = course === 'Other' ? otherCourse : course;
 
+  if (teamName.length < 2 || teamName.length > 60) return send(res, 400, { error: 'Enter a team name between 2 and 60 characters.' });
   if (fullName.length < 3 || fullName.length > 100 || !/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(fullName)) return send(res, 400, { error: 'Enter a valid full name.' });
   if (!/^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/.test(enrollmentNumber)) return send(res, 400, { error: 'Enter a valid enrollment number (up to 32 letters or numbers).' });
   if (!/^\+91[6-9]\d{9}$/.test(phone)) return send(res, 400, { error: 'Enter a valid 10-digit Indian mobile number.' });
@@ -72,6 +74,7 @@ module.exports = async function handler(req, res) {
 
   const registrationCode = `SPOOK-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
   const row = {
+    team_name: teamName,
     full_name: fullName,
     student_id: enrollmentNumber,
     phone,

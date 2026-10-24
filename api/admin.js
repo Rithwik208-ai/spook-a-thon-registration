@@ -39,6 +39,7 @@ function parseBody(req) {
 }
 
 function validRegistration(body) {
+  const teamName = String(body.team_name || body.full_name || '').trim().replace(/\s+/g, ' ');
   const fullName = String(body.full_name || '').trim().replace(/\s+/g, ' ');
   const enrollment = String(body.student_id || '').trim();
   const phone = String(body.phone || '').trim();
@@ -50,6 +51,7 @@ function validRegistration(body) {
   const member2Phone = body.member2_phone == null ? null : String(body.member2_phone).trim();
   const member2Email = body.member2_email == null ? null : String(body.member2_email).trim().toLowerCase();
 
+  if (teamName.length < 2 || teamName.length > 60) return { error: 'Enter a team name between 2 and 60 characters.' };
   if (fullName.length < 3 || fullName.length > 100 || !NAME.test(fullName)) return { error: 'Enter a valid full name.' };
   if (!ENROLLMENT.test(enrollment)) return { error: 'Enter a valid enrollment number (up to 32 letters or numbers).' };
   if (!PHONE.test(phone)) return { error: 'Enter a valid 10-digit Indian mobile number.' };
@@ -64,6 +66,7 @@ function validRegistration(body) {
     if (member2Email === email) return { error: 'Team members must use different email addresses.' };
   }
   return { value: {
+    team_name: teamName,
     full_name: fullName, student_id: enrollment, phone, email, course, academic_year: year,
     team_size: teamSize,
     member2_name: teamSize === 2 ? member2Name : null,
@@ -93,7 +96,7 @@ module.exports = async function handler(req, res) {
     };
 
     if (req.method === 'GET') {
-      const select = 'id,full_name,student_id,phone,email,course,academic_year,semester,team_size,member2_name,member2_phone,member2_email,registration_code,created_at';
+      const select = 'id,team_name,full_name,student_id,phone,email,course,academic_year,semester,team_size,member2_name,member2_phone,member2_email,registration_code,created_at';
       const enrollmentNumber = url.searchParams.get('enrollmentNumber');
       if (enrollmentNumber !== null) {
         if (!ENROLLMENT.test(enrollmentNumber)) return send(res, 400, { error: 'Enter a valid enrollment number.' });
