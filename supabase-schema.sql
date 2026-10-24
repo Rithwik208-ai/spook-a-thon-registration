@@ -15,6 +15,7 @@ create table if not exists public.registrations (
   member2_name text,
   member2_phone text check (member2_phone is null or member2_phone ~ '^\+91[6-9]\d{9}$'),
   member2_email text,
+  member2_course text,
   member2_academic_year smallint check (member2_academic_year is null or member2_academic_year between 1 and 4),
   member2_branch text,
   registration_code text not null constraint registrations_registration_code_key unique,
@@ -32,6 +33,7 @@ alter table public.registrations add column if not exists team_size smallint not
 alter table public.registrations add column if not exists member2_name text;
 alter table public.registrations add column if not exists member2_phone text;
 alter table public.registrations add column if not exists member2_email text;
+alter table public.registrations add column if not exists member2_course text;
 alter table public.registrations add column if not exists branch text;
 alter table public.registrations add column if not exists member2_academic_year smallint;
 alter table public.registrations add column if not exists member2_branch text;
@@ -65,9 +67,9 @@ alter table public.registrations drop constraint if exists registrations_member2
 alter table public.registrations add constraint registrations_member2_phone_check check (member2_phone is null or member2_phone ~ '^\+91[6-9]\d{9}$');
 alter table public.registrations drop constraint if exists registrations_member2_complete_check;
 alter table public.registrations add constraint registrations_member2_complete_check check (
-  (team_size = 1 and member2_name is null and member2_phone is null and member2_email is null and member2_academic_year is null and member2_branch is null)
+  (team_size = 1 and member2_name is null and member2_phone is null and member2_email is null and member2_course is null and member2_academic_year is null and member2_branch is null)
   or
-  (team_size = 2 and char_length(member2_name) between 3 and 100 and member2_phone ~ '^\+91[6-9]\d{9}$' and member2_email ~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$' and ((member2_academic_year is null and member2_branch is null) or (member2_academic_year between 1 and 4 and char_length(member2_branch) between 2 and 80)))
+  (team_size = 2 and char_length(member2_name) between 3 and 100 and member2_phone ~ '^\+91[6-9]\d{9}$' and member2_email ~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$' and ((member2_course is null and member2_academic_year is null and member2_branch is null) or (char_length(member2_course) between 2 and 100 and member2_academic_year between 1 and 4 and char_length(member2_branch) between 2 and 80)))
 ) not valid;
 create unique index if not exists registrations_member2_email_key on public.registrations (member2_email) where member2_email is not null;
 
