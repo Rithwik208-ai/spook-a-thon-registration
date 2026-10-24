@@ -27,6 +27,27 @@ alter table public.registrations add column if not exists team_size smallint not
 alter table public.registrations add column if not exists member2_name text;
 alter table public.registrations add column if not exists member2_phone text;
 alter table public.registrations add column if not exists member2_email text;
+-- Bring older live tables in line with the current form without losing rows.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'registrations' and column_name = 'graduation_year'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'registrations' and column_name = 'academic_year'
+  ) then
+    alter table public.registrations rename column graduation_year to academic_year;
+  end if;
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'registrations' and column_name = 'team_name'
+  ) then
+    execute 'alter table public.registrations alter column team_name drop not null';
+  end if;
+end $$;
+alter table public.registrations add column if not exists academic_year smallint;
+notify pgrst, 'reload schema';
 alter table public.registrations drop constraint if exists registrations_student_id_check;
 alter table public.registrations drop constraint if exists registrations_student_id_format_check;
 alter table public.registrations add constraint registrations_student_id_format_check check (student_id ~ '^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$');
@@ -34,14 +55,14 @@ alter table public.registrations drop constraint if exists registrations_team_si
 alter table public.registrations add constraint registrations_team_size_check check (team_size in (1, 2));
 alter table public.registrations drop constraint if exists registrations_member2_phone_check;
 alter table public.registrations add constraint registrations_member2_phone_check check (member2_phone is null or member2_phone ~ '^\+91[6-9]\d{9}$');
-create unique index if not exists registrations_member2_email_key on public.registrations (member2_email) where member2_email is not null;
-
-alter table public.registrations enable row level security;
-revoke all on table public.registrations from public, anon, authenticated;
-grant all on table public.registrations to service_role;
 alter table public.registrations drop constraint if exists registrations_member2_complete_check;
 alter table public.registrations add constraint registrations_member2_complete_check check (
   (team_size = 1 and member2_name is null and member2_phone is null and member2_email is null)
   or
   (team_size = 2 and char_length(member2_name) between 3 and 100 and member2_phone ~ '^\+91[6-9]\d{9}$' and member2_email ~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$')
 );
+create unique index if not exists registrations_member2_email_key on public.registrations (member2_email) where member2_email is not null;
+
+alter table public.registrations enable row level security;
+revoke all on table public.registrations from public, anon, authenticated;
+grant all on table public.registrations to service_role;
