@@ -651,6 +651,14 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
                 <p class="msg" id="m-email">Personal email addresses are accepted.</p>
               </div>
 
+              <button class="add-member" id="addMember" type="button" aria-expanded="false">＋ Add team member (optional)</button>
+              <div class="conditional" id="member2Fields" hidden>
+                <div class="team-heading"><span>♟ Team member</span><small>Maximum 2 people · optional</small></div>
+                <div class="field"><label for="member2Name">Member name<b aria-hidden="true">*</b></label><div class="control"><input id="member2Name" type="text" autocomplete="name" placeholder="Second member's full name" maxlength="100" aria-describedby="m-member2Name"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Name"></p></div>
+                <div class="field"><label for="member2Phone">Phone number<b aria-hidden="true">*</b></label><div class="control"><input id="member2Phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit Indian mobile number" maxlength="14" aria-describedby="m-member2Phone"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Phone"></p></div>
+                <div class="field"><label for="member2Email">Email address<b aria-hidden="true">*</b></label><div class="control"><input id="member2Email" type="email" autocomplete="email" placeholder="second@example.com" maxlength="120" aria-describedby="m-member2Email"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Email">Personal email addresses are accepted.</p></div>
+              </div>
+
               <div class="field" data-hint="">
                 <label for="course">Course / programme<b aria-hidden="true">*</b></label>
                 <div class="control">
@@ -710,14 +718,6 @@ button,.sound,.gbtn,.cta{touch-action:manipulation;-webkit-tap-highlight-color:t
                   <p class="msg" id="m-teamSize"></p>
                 </div>
               </div>
-              <button class="add-member" id="addMember" type="button" aria-expanded="false">＋ Add team member (optional)</button>
-              <div class="conditional" id="member2Fields" hidden>
-                <div class="team-heading"><span>♟ Team member</span><small>Maximum 2 people · optional</small></div>
-                <div class="field"><label for="member2Name">Member name<b aria-hidden="true">*</b></label><div class="control"><input id="member2Name" type="text" autocomplete="name" placeholder="Second member's full name" maxlength="100" aria-describedby="m-member2Name"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Name"></p></div>
-                <div class="field"><label for="member2Phone">Phone number<b aria-hidden="true">*</b></label><div class="control"><input id="member2Phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit Indian mobile number" maxlength="14" aria-describedby="m-member2Phone"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Phone"></p></div>
-                <div class="field"><label for="member2Email">Email address<b aria-hidden="true">*</b></label><div class="control"><input id="member2Email" type="email" autocomplete="email" placeholder="second@example.com" maxlength="120" aria-describedby="m-member2Email"><svg class="fl" aria-hidden="true"><use href="#flameSym"/></svg></div><p class="msg" id="m-member2Email">Personal email addresses are accepted.</p></div>
-              </div>
-
               <div class="cta-wrap" id="ctaWrap">
                 <button class="cta" id="cta" type="submit">Complete registration</button>
               </div>
