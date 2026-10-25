@@ -1,5 +1,7 @@
 const crypto = require('node:crypto');
 
+const BRANCH = /^[\p{L}\p{N}][\p{L}\p{N} .&()+/-]{1,79}$/u;
+
 const COURSES = new Set([
   'B.Sc IT','B.Sc IT (Hons.)','B.Sc IT (Hons.) with Research','B.Sc','B.Sc (Hons.)','B.Sc Computer Science',
   'B.Sc Computer Science (Hons.)','B.Sc Data Science','B.Sc Mathematics','B.Sc Physics','B.Sc Chemistry',
@@ -49,12 +51,18 @@ module.exports = async function handler(req, res) {
   const email = String(body.email || '').trim().toLowerCase();
   const course = String(body.course || '').trim();
   const academicYear = Number(body.academicYear);
+  const branch = String(body.branch || '').trim().replace(/\s+/g, ' ');
   const teamSize = Number(body.teamSize || 1);
   const otherCourse = String(body.otherCourse || '').trim();
   const member2 = body.member2 && typeof body.member2 === 'object' && !Array.isArray(body.member2) ? body.member2 : {};
   const member2Name = String(member2.fullName || '').trim().replace(/\s+/g, ' ');
   const member2Phone = String(member2.phone || '').replace(/[\s()-]/g, '');
   const member2Email = String(member2.email || '').trim().toLowerCase();
+  const member2CourseChoice = String(member2.course || '').trim();
+  const member2OtherCourse = String(member2.otherCourse || '').trim();
+  const member2Course = member2CourseChoice === 'Other' ? member2OtherCourse : member2CourseChoice;
+  const member2Year = Number(member2.academicYear);
+  const member2Branch = String(member2.branch || '').trim().replace(/\s+/g, ' ');
   const storedCourse = course === 'Other' ? otherCourse : course;
 
   if (teamName.length < 2 || teamName.length > 60) return send(res, 400, { error: 'Enter a team name between 2 and 60 characters.' });
@@ -64,12 +72,16 @@ module.exports = async function handler(req, res) {
   if (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return send(res, 400, { error: 'Enter a valid email address.' });
   if (!COURSES.has(course) || (course === 'Other' ? otherCourse.length < 2 || otherCourse.length > 100 : false)) return send(res, 400, { error: 'Choose a course or enter your course under Other.' });
   if (![1, 2, 3, 4].includes(academicYear)) return send(res, 400, { error: 'Choose a valid academic year.' });
+  if (!BRANCH.test(branch)) return send(res, 400, { error: 'Enter a valid branch for the team leader.' });
   if (![1, 2].includes(teamSize)) return send(res, 400, { error: 'Choose a team size of one or two members.' });
   if (teamSize === 2) {
     if (member2Name.length < 3 || member2Name.length > 100 || !/^[\p{L}][\p{L}\p{M} .'-]*$/u.test(member2Name)) return send(res, 400, { error: 'Enter a valid full name for team member 2.' });
     if (!/^\+91[6-9]\d{9}$/.test(member2Phone)) return send(res, 400, { error: 'Enter a valid 10-digit Indian mobile number for team member 2.' });
     if (member2Email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(member2Email)) return send(res, 400, { error: 'Enter a valid email address for team member 2.' });
     if (member2Email === email) return send(res, 400, { error: 'Each team member must use a different email address.' });
+    if (!COURSES.has(member2CourseChoice) || (member2CourseChoice === 'Other' ? member2OtherCourse.length < 2 || member2OtherCourse.length > 100 : false)) return send(res, 400, { error: 'Choose a course for team member 2 or enter it under Other.' });
+    if (![1, 2, 3, 4].includes(member2Year)) return send(res, 400, { error: 'Choose a valid academic year for team member 2.' });
+    if (!BRANCH.test(member2Branch)) return send(res, 400, { error: 'Enter a valid branch for team member 2.' });
   }
 
   const registrationCode = `SPOOK-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
@@ -81,10 +93,14 @@ module.exports = async function handler(req, res) {
     email,
     course: storedCourse,
     academic_year: academicYear,
+    branch,
     team_size: teamSize,
     member2_name: teamSize === 2 ? member2Name : null,
     member2_phone: teamSize === 2 ? member2Phone : null,
     member2_email: teamSize === 2 ? member2Email : null,
+    member2_course: teamSize === 2 ? member2Course : null,
+    member2_academic_year: teamSize === 2 ? member2Year : null,
+    member2_branch: teamSize === 2 ? member2Branch : null,
     registration_code: registrationCode
   };
 
