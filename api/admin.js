@@ -2,6 +2,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE = /^\+91[6-9]\d{9}$/;
 const NAME = /^[\p{L}][\p{L}\p{M} .'-]*$/u;
 const ENROLLMENT = /^[A-Za-z0-9][A-Za-z0-9/-]{0,31}$/;
+const BRANCH = /^[\p{L}\p{N}][\p{L}\p{N} .&()+/-]{1,79}$/u;
 
 function send(res, status, body) {
   return res.status(status).json(body);
@@ -46,10 +47,14 @@ function validRegistration(body) {
   const email = String(body.email || '').trim().toLowerCase();
   const course = String(body.course || '').trim();
   const year = Number(body.academic_year);
+  const branch = String(body.branch || '').trim().replace(/\s+/g, ' ');
   const teamSize = Number(body.team_size);
   const member2Name = String(body.member2_name || '').trim().replace(/\s+/g, ' ');
   const member2Phone = body.member2_phone == null ? null : String(body.member2_phone).trim();
   const member2Email = body.member2_email == null ? null : String(body.member2_email).trim().toLowerCase();
+  const member2Course = body.member2_course == null ? null : String(body.member2_course).trim();
+  const member2Year = body.member2_academic_year == null ? null : Number(body.member2_academic_year);
+  const member2Branch = body.member2_branch == null ? null : String(body.member2_branch).trim().replace(/\s+/g, ' ');
 
   if (teamName.length < 2 || teamName.length > 60) return { error: 'Enter a team name between 2 and 60 characters.' };
   if (fullName.length < 3 || fullName.length > 100 || !NAME.test(fullName)) return { error: 'Enter a valid full name.' };
@@ -58,20 +63,27 @@ function validRegistration(body) {
   if (email.length > 120 || !EMAIL.test(email)) return { error: 'Enter a valid email address.' };
   if (course.length < 2 || course.length > 100) return { error: 'Enter a valid course or programme.' };
   if (![1, 2, 3, 4].includes(year)) return { error: 'Choose a valid academic year.' };
+  if (!BRANCH.test(branch)) return { error: 'Enter a valid branch for the team leader.' };
   if (![1, 2].includes(teamSize)) return { error: 'Choose a team size of one or two.' };
   if (teamSize === 2) {
     if (member2Name.length < 3 || member2Name.length > 100 || !NAME.test(member2Name)) return { error: 'Enter a valid name for team member 2.' };
     if (!PHONE.test(member2Phone || '')) return { error: 'Enter a valid phone number for team member 2.' };
     if ((member2Email || '').length > 120 || !EMAIL.test(member2Email || '')) return { error: 'Enter a valid email address for team member 2.' };
     if (member2Email === email) return { error: 'Team members must use different email addresses.' };
+    if (!member2Course || member2Course.length < 2 || member2Course.length > 100) return { error: 'Enter a valid course or programme for team member 2.' };
+    if (![1, 2, 3, 4].includes(member2Year)) return { error: 'Choose a valid academic year for team member 2.' };
+    if (!BRANCH.test(member2Branch || '')) return { error: 'Enter a valid branch for team member 2.' };
   }
   return { value: {
     team_name: teamName,
-    full_name: fullName, student_id: enrollment, phone, email, course, academic_year: year,
+    full_name: fullName, student_id: enrollment, phone, email, course, academic_year: year, branch,
     team_size: teamSize,
     member2_name: teamSize === 2 ? member2Name : null,
     member2_phone: teamSize === 2 ? member2Phone : null,
-    member2_email: teamSize === 2 ? member2Email : null
+    member2_email: teamSize === 2 ? member2Email : null,
+    member2_course: teamSize === 2 ? member2Course : null,
+    member2_academic_year: teamSize === 2 ? member2Year : null,
+    member2_branch: teamSize === 2 ? member2Branch : null
   } };
 }
 
@@ -96,7 +108,7 @@ module.exports = async function handler(req, res) {
     };
 
     if (req.method === 'GET') {
-      const select = 'id,team_name,full_name,student_id,phone,email,course,academic_year,semester,team_size,member2_name,member2_phone,member2_email,registration_code,created_at';
+      const select = 'id,team_name,full_name,student_id,phone,email,course,academic_year,branch,semester,team_size,member2_name,member2_phone,member2_email,member2_course,member2_academic_year,member2_branch,registration_code,created_at';
       const enrollmentNumber = url.searchParams.get('enrollmentNumber');
       if (enrollmentNumber !== null) {
         if (!ENROLLMENT.test(enrollmentNumber)) return send(res, 400, { error: 'Enter a valid enrollment number.' });
